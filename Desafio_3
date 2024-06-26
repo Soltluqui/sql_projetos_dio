@@ -1,0 +1,54 @@
+SHOW DATABASES;
+USE COMPANY_CONSTRAINTS;
+
+-- Qual o departamento com maior número de pessoas? 
+SHOW TABLES; 
+CREATE INDEX idx_dno ON employee(dno);
+EXPLAIN SELECT count(ssn) AS Number_of_employee, DNO AS Dept_Number FROM employee GROUP BY dno;
+
+-- Quais são os departamentos por cidade? 
+CREATE INDEX idx_dnumber ON department(Dnumber);
+EXPLAIN SELECT dnumber AS Dept_Numb, Dname AS Dept_Name, Dlocation AS Location FROM department NATURAL JOIN dept_locations;
+
+-- Relação de empregrados por departamento 
+EXPLAIN SELECT count(ssn) AS Number_of_employee, DNO AS Dept_Number, dname FROM employee, department WHERE dno = dnumber GROUP BY dno;
+
+
+
+USE ecommerce;
+
+DELIMITER //
+
+CREATE PROCEDURE ManageData (
+    IN action INT,            -- variável de controle para determinar a ação
+    IN data_id INT,           -- id do dado a ser manipulado
+    IN new_value VARCHAR(255) -- novo valor para atualização (para o caso de UPDATE)
+)
+BEGIN
+    -- Verificar a ação a ser executada
+    IF action = 1 THEN
+        -- SELECT: buscar os dados
+        SELECT * FROM product WHERE idproduct = data_id;
+        
+    ELSEIF action = 2 THEN
+        -- UPDATE: atualizar o dado
+        UPDATE product SET Avaliação = new_value WHERE idproduct = data_id;
+
+    ELSEIF action = 3 THEN
+        -- DELETE: remover o dado
+        DELETE FROM product WHERE idproduct = data_id;
+
+    ELSE
+        -- Se a ação não for reconhecida, retorna uma mensagem de erro
+        SELECT 'Ação inválida. Especifique 1 para SELECT, 2 para UPDATE ou 3 para DELETE.' AS erro;
+    
+    END IF;
+END //
+
+DELIMITER ;
+
+CALL managedata (4,1,2); -- Apresentação de erro
+CALL managedata (1,3,""); -- Select realizado
+CALL managedata (2,2,9); -- Mudança de valor 
+SELECT * FROM product;
+CALL managedata (3,3,""); -- Deletar um valor 
