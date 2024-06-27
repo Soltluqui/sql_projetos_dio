@@ -1,0 +1,80 @@
+USE company_constraints;
+
+-- Número de empregados por departamento e localidade 
+CREATE VIEW employee_dprt AS
+    SELECT 
+        COUNT(Ssn), Dname, Dlocation
+    FROM
+        employee,
+        department n
+            JOIN
+        dept_locations s ON n.dnumber = s.dnumber
+    WHERE
+        dno = s.dnumber
+    GROUP BY dname , dlocation , dno;
+
+-- Lista de departamentos e seus gerentes 
+CREATE VIEW manager_dept AS
+    SELECT 
+        CONCAT(fname, ' ', lname) AS Name, Ssn, dname AS Department
+    FROM
+        employee
+            JOIN
+        department ON mgr_ssn = ssn;
+
+-- Projetos com maior número de empregados (ex: por ordenação desc)
+CREATE VIEW project_employee_number AS
+    SELECT 
+        COUNT(ssn), dname, s.pname
+    FROM
+        employee,
+        department
+            JOIN
+        project s ON dnumber = dnum
+    WHERE
+        dno = dnumber
+    GROUP BY dno , s.pname
+    ORDER BY COUNT(ssn) ASC;
+
+-- Lista de projetos, departamentos e gerentes 
+CREATE VIEW projct_deprt_mgr AS
+    SELECT 
+        pname, dname, mgr_ssn, CONCAT(Fname, ' ', Lname) AS Name
+    FROM
+        project
+            JOIN
+        department ON dnum = dnumber
+            JOIN
+        employee ON ssn = mgr_ssn;
+
+	-- Quais empregados possuem dependentes e se são gerentes 
+CREATE VIEW employee_dependent_mgr AS
+    SELECT 
+        CONCAT(Fname, ' ', Lname) AS Name,
+        Ssn,
+        Dependent_name AS `Dependent Name`,
+        Relationship,
+        CASE
+            WHEN ssn = mgr_ssn THEN 'Is a Manager!'
+            ELSE 'Not a manager'
+        END AS `Is a manager?`
+    FROM
+        employee
+            JOIN
+        dependent ON ssn = essn
+            LEFT JOIN
+        department ON mgr_ssn = ssn;
+        
+        
+CREATE USER 'manager'@'localhost' IDENTIFIED BY '12345678';
+REVOKE SELECT ON employee_dprt FROM PUBLIC;
+REVOKE SELECT ON manager_dept FROM PUBLIC;
+REVOKE SELECT ON project_employee_number FROM PUBLIC;
+REVOKE SELECT ON projct_deprt_mgr FROM PUBLIC;
+REVOKE SELECT ON employee_dependent_mgr FROM PUBLIC;
+GRANT SELECT ON employee_dprt TO 'manager'@'localhost';
+GRANT SELECT ON manager_dept TO 'manager'@'localhost';
+GRANT SELECT ON project_employee_number TO 'manager'@'localhost';
+GRANT SELECT ON employee_dependent_mgr TO 'manager'@'localhost';
+GRANT SELECT ON employee_dependent_mgr TO 'manager'@'localhost';
+FLUSH PRIVILEGES;
