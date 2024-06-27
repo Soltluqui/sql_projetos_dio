@@ -64,3 +64,17 @@ CREATE VIEW employee_dependent_mgr AS
         dependent ON ssn = essn
             LEFT JOIN
         department ON mgr_ssn = ssn;
+        
+        
+CREATE USER 'manager'@'localhost' IDENTIFIED BY '12345678';
+REVOKE SELECT ON employee_dprt FROM PUBLIC;
+REVOKE SELECT ON manager_dept FROM PUBLIC;
+REVOKE SELECT ON project_employee_number FROM PUBLIC;
+REVOKE SELECT ON projct_deprt_mgr FROM PUBLIC;
+REVOKE SELECT ON employee_dependent_mgr FROM PUBLIC;
+GRANT SELECT ON employee_dprt TO 'manager'@'localhost';
+GRANT SELECT ON manager_dept TO 'manager'@'localhost';
+GRANT SELECT ON project_employee_number TO 'manager'@'localhost';
+GRANT SELECT ON employee_dependent_mgr TO 'manager'@'localhost';
+GRANT SELECT ON employee_dependent_mgr TO 'manager'@'localhost';
+FLUSH PRIVILEGES;
