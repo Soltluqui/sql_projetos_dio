@@ -1,0 +1,37 @@
+USE ecommerce;
+
+START TRANSACTION;
+
+	SELECT * FROM clients WHERE idclient = 4;
+	UPDATE clients SET fname = "Carla" WHERE idclient = 4; 
+
+COMMIT;
+
+DELIMITER //
+
+CREATE PROCEDURE name_transaction()
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET @mensagem_erro = 'Ocorreu um erro durante a execução da transação.';
+        SELECT @mensagem_erro AS mensagem_erro;
+    END;
+
+	SET @mensagem_erro = '';
+    
+    START TRANSACTION;
+    
+	SELECT * FROM clients WHERE idclient = 4;
+    UPDATE  clients SET fname = "Bruna" WHERE idclient = 4;
+    
+    COMMIT;
+    
+    SET @mensagem_erro = 'Transação concluída com sucesso.';
+    SELECT @mensagem_erro AS mensagem_erro;
+    
+END //
+
+DELIMITER ;
+
+CALL name_transaction();
