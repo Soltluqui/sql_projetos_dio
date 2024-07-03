@@ -1,0 +1,11 @@
+cd C:\Program Files\MySQL\MySQL Server 8.0\bin\
+mysqldump -u root -p ecommerce --single-transaction --routines --triggers > ecommerce_backup.sql
+mysqldump -u root -p ecommerce_novo  < ecommerce_backup.sql
+
+
+--Somente os dados
+mysqldump -u root -p ecommerce --no-create-info --single-transaction --routines --triggers > ecommerce_backup.sql
+
+
+--Somente a estrutura
+mysqldump -u root -p ecommerce --no-data --single-transaction --routines --triggers > ecommerce_backup.sql
